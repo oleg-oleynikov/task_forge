@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"sync"
 	"task-forge/internal/task"
 	"time"
@@ -20,7 +21,7 @@ func New(id string, store task.TaskStore, registry *ExecutorRegistry) *worker {
 		id:       id,
 		store:    store,
 		registry: registry,
-		lease:    5 * time.Minute, // TODO: получать lease извне
+		lease:    5 * time.Minute, // TODO: get lease outside
 	}
 }
 
@@ -38,11 +39,23 @@ func (w *worker) Run(ctx context.Context, concurrency int) {
 
 func (w *worker) loop(ctx context.Context, workerID string) {
 	ticker := time.NewTicker(time.Second * 2) // Поменять на duration извне
-	return
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			slog.Info("worker stopping", "id", workerID) // TODO: поменять logger
+			return
+		case <-ticker.C:
+			if err := w.process(ctx, workerID); err != nil {
+				slog.Error("process failed", "worker", workerID, "err", err)
+			}
+			return
+		}
+	}
 }
 
-func process(ctx context.Context) error {
+func (w *worker) process(ctx context.Context, workerID string) error {
+	w.store.Claim(ctx, workerID, "")
 	return nil
 }
-
-// func

@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"task-forge/internal/models"
 	"time"
 )
@@ -29,20 +30,21 @@ func NewPostgresTaskStore(dsn string, lease time.Duration) (*PostgresTaskStore, 
 }
 
 func Claim(ctx context.Context, workerID, queueName string) (*models.Task, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not implemented")
 }
+
 func Complete(ctx context.Context, taskID string) error {
-	return nil
+	return fmt.Errorf("Not implemented")
 }
 
 func Create(ctx context.Context, task models.Task) error {
-	return nil
+	return fmt.Errorf("Not implemented")
 }
 
 func Heartbeat(ctx context.Context, taskID string, workerID string) error {
-	return nil
+	return fmt.Errorf("Not implemented")
 }
 
 func Fail(ctx context.Context, task *models.Task, execErr error) error {
-	return nil
+	return fmt.Errorf("Not implemented")
 }
